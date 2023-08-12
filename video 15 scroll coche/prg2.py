@@ -18,9 +18,11 @@ class Coche(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-        self.aceleracion = 0.3 
-        self.deceleracion = 0.1
-        self.frenar = 0.5
+        self.ultimo_update_sonidoFreno = pygame.time.get_ticks()
+
+        self.aceleracion = 0.2 
+        self.deceleracion = 0.05
+        self.frenar = 0.4
         self.max_velocidad = 30
 
 
@@ -46,6 +48,7 @@ class Coche(pygame.sprite.Sprite):
                 self.game.velocidad += self.aceleracion
 
         elif tecla[pygame.K_DOWN]:
+            self.sonidoFreno()
             if self.game.velocidad - self.frenar < 0:
                 self.game.velocidad -= 0.0
             else:
@@ -57,7 +60,10 @@ class Coche(pygame.sprite.Sprite):
             else:
                 self.game.velocidad -= self.deceleracion
 
+        if tecla[pygame.K_SPACE]:
+            self.game.sonido_claxon.play()
 
+        # GIRAR direccion (si hemos pulsado Izda o Dcha)
         self.rect.x += offSetX
 
 
@@ -68,6 +74,13 @@ class Coche(pygame.sprite.Sprite):
 
         elif self.rect.right > self.game.RESOLUCION[0] - zonaVerde:
             self.rect.right = self.game.RESOLUCION[0] - zonaVerde
+
+
+    def sonidoFreno(self):
+        calculo = pygame.time.get_ticks()
+        if calculo - self.ultimo_update_sonidoFreno > 3000:
+            self.ultimo_update_sonidoFreno = calculo
+            self.game.sonido_frenar.play()
 
 
 class scrollRoad(pygame.sprite.Sprite):
@@ -90,6 +103,29 @@ class scrollRoad(pygame.sprite.Sprite):
     def checkLimites(self):
         if self.rect.y + self.game.velocidad > 0:
             self.rect.y = -600
+
+
+class cochesEnemigos(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        super().__init__()
+        self.game = game
+
+        self.image = pygame.image.load('../assets/coche_enemigo.png').convert()
+        self.image.set_colorkey((255, 255, 255))
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+        self.velocidad = 10
+
+
+    def update(self):
+        self.rect.y += self.calcularOffSetY()
+
+
+    def calcularOffSetY(self):
+        return self.game.velocidad - self.velocidad
 
 
 class Textos(pygame.sprite.Sprite):

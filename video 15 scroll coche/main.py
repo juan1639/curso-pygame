@@ -17,8 +17,9 @@ from prg2 import *
 class Game:
 	def __init__(self):
 		pygame.init()
+		pygame.mixer.init()
 
-		self.rojo = (255, 0, 0)
+		self.rojo = (255, 20, 10)
 		self.verde = (0, 255, 0)
 		self.amarillo = (255, 255, 0)
 		self.fondoGRIS = (70, 70, 70)
@@ -32,6 +33,9 @@ class Game:
 		self.pantalla = pygame.display.set_mode(self.RESOLUCION)
 		self.reloj = pygame.time.Clock()
 
+		self.sonido_frenar = pygame.mixer.Sound('../assets/frenando.mp3')
+		self.sonido_claxon = pygame.mixer.Sound('../assets/claxon_1.mp3')
+
 		self.lista_spritesAdibujar = pygame.sprite.Group()
 		self.lista_scroll = pygame.sprite.Group()
 		self.instancias()
@@ -40,6 +44,9 @@ class Game:
 	def instancias(self):
 		coche = Coche(self, self.RESOLUCION[0] // 2, self.RESOLUCION[1] // 1.5)
 		self.lista_spritesAdibujar.add(coche)
+
+		coche_enemigo = cochesEnemigos(self, 300, 200)
+		self.lista_spritesAdibujar.add(coche_enemigo)
 
 		scrollroad = scrollRoad(self, 0, -600)
 		self.lista_scroll.add(scrollroad)
